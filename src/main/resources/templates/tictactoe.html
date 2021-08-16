@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+
+	<title>Tic Tac Toe</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="js/tictactoegame-main.js"></script>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="css/tictactoegame-style.css" />
+
+	<link rel="icon" type="image/png" href="images/tictactoe.png" />
+
+</head>
+<body>
+
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<div class="navbar-header">
+   			<span class="navbar-brand">
+     			<img alt="Brand" src="images/tictactoe.png" /> Tic Tac Toe
+   			</span>
+		</div>
+	</div>
+</nav>
+
+<div class="game-area panel panel-default">
+	<div class="panel-body">
+
+		<h4 class="game-status">
+    	<span th:if="${game.currentPlayer().getState().isPlaying()}" class="label label-default">
+    		Your turn </span>
+			<span th:if="${game.currentPlayer().getState().isWin()}"
+				  th:text="${game.currentPlayer().getMark().toString().toUpperCase()} + ' is WIN!'"
+				  class="label label-success">
+    		YOU WIN! </span>
+			<span th:if="${game.nextPlayer().getState().isLose()}"
+				  th:text="${game.nextPlayer().getMark().toString().toUpperCase()} + ' have LOST!'"
+				  class="label label-danger">
+    		You've lost... </span>
+			<span th:if="${game.currentPlayer().getState().isDraw()}" class="label label-info">
+    		Draw?! </span>
+		</h4>
+
+		<table class="board">
+			<tr th:each="row : ${game.board().get()}" class="board-row">
+				<td th:each="square : ${row}">
+					<div th:id="${square.getId()}" class="board-row-square"
+						 th:classappend="${!square.isEmpty()} ? ${square} + '-value' : (${!game.getGameState().isFinished()} ? 'available')"
+						 th:text="${square}">
+						&nbsp;
+					</div>
+				</td>
+			</tr>
+		</table>
+
+		<form id="form_mark_square" th:action="@{/}" method="POST" class="form-inline">
+
+			<div class="checkbox">
+				<label><input name="player_move_first" type="checkbox" th:checked="${game.isPlayerMoveFirst()}" /> Player move first ? </label>
+			</div>
+
+			<div class="btn-restart-wrap">
+				<a id="btn-restart" class="btn btn-success btn-lg" href="javascript:void(0);" role="button">Restart</a>
+			</div>
+
+			<input id="is_game_over" type="hidden" th:value="${game.getGameState().isFinished()}" />
+			<input id="square_id" name="square_id" type="hidden" value="" />
+			<input id="restart" name="restart" type="hidden" value="" />
+		</form>
+
+		<h4 class="text-center"><a href="/welcome">Your page</a></h4>
+
+		<div sec:authorize="isAuthenticated()">
+			<form id="logoutForm" method="POST" th:action="@{/logout}">
+				<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+			</form>
+			<h4><a onclick="document.forms['logoutForm'].submit()">Logout</a></h4>
+		</div>
+
+	</div>
+</div>
+
+</body>
+</html>
